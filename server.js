@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Servir los archivos estáticos de tu aplicación
+// Servir archivos estáticos (importante para apps React/Vite)
 app.use(express.static(path.join(__dirname, 'dist')));
 app.use(express.static(__dirname));
 
