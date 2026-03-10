@@ -15,7 +15,7 @@ if "%API_KEY%"=="" (
     pause & exit /b 1
 )
 
-set /p PROJECT_ID="2. Escribe tu Google Cloud Project ID y pulsa Enter: "
+set /p PROJECT_ID="gen-lang-client-0796205805"
 if "%PROJECT_ID%"=="" (
     echo ERROR: El Project ID no puede estar vacio.
     pause & exit /b 1
