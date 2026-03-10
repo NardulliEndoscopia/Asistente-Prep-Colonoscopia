@@ -9,7 +9,7 @@ echo Necesitas tener instalado Google Cloud CLI (gcloud).
 echo Si no lo tienes: https://cloud.google.com/sdk/docs/install
 echo.
 
-set /p API_KEY="1. Pega tu clave GEMINI_API_KEY y pulsa Enter: "
+set /p API_KEY="AIzaSyD4Bi2vZbLJ-qsEOquTGAZVPIoo2WJdDBs"
 if "%API_KEY%"=="" (
     echo ERROR: La clave no puede estar vacia.
     pause & exit /b 1
