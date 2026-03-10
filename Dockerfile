@@ -1,38 +1,35 @@
-# ── Etapa 1: construir la app ──────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+# Usar imagen completa de Node (no alpine) para evitar problemas de compilación
+FROM node:20 AS builder
 
 WORKDIR /app
 
-# Copiar archivos de dependencias
-COPY package*.json ./
+# Copiar package.json con dependencias limpias (sin better-sqlite3)
+COPY package.json ./
 
-# Instalar todas las dependencias (incluyendo devDependencies para el build)
-RUN npm ci
+# Instalar dependencias (sin package-lock para mayor flexibilidad)
+RUN npm install --legacy-peer-deps
 
-# Copiar el resto del código fuente
+# Copiar código fuente
 COPY . .
 
-# Construir la aplicación para producción
-# La variable GEMINI_API_KEY se inyecta en tiempo de ejecución, no en build.
-# Para que vite pueda compilar sin error, pasamos un placeholder.
-RUN GEMINI_API_KEY=placeholder npm run build
+# Compilar la app - la clave API se inyecta aquí
+ARG GEMINI_API_KEY=""
+ENV GEMINI_API_KEY=$GEMINI_API_KEY
+ENV VITE_GEMINI_API_KEY=$GEMINI_API_KEY
 
-# ── Etapa 2: servidor de producción ────────────────────────────────────────────
-FROM node:20-alpine AS runner
+RUN npm run build
+
+# --- Servidor de producción (imagen ligera) ---
+FROM node:20-slim AS runner
 
 WORKDIR /app
 
-# Solo instalar dependencias de producción necesarias para el servidor
-RUN npm install express dotenv --save
+# Solo instalar express para servir archivos
+RUN npm install express
 
-# Copiar los archivos compilados desde la etapa anterior
+# Traer archivos compilados del builder
 COPY --from=builder /app/dist ./dist
+COPY server.cjs ./
 
-# Copiar el servidor Express
-COPY server.cjs ./server.cjs
-
-# Puerto que usa Cloud Run
 EXPOSE 8080
-
-# Arrancar el servidor
 CMD ["node", "server.cjs"]
